@@ -13,7 +13,7 @@ variable "s3_key" {
 }
 
 resource "aws_elastic_beanstalk_application" "my_app" {
-  name        = "my-eb-application"
+  name        = "Sample-beanstalk-env"
   description = "My Elastic Beanstalk Application"
 }
 
