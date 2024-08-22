@@ -15,19 +15,24 @@ pipeline {
 
         stage('Upload to S3') {
             steps {
-                withCredentials([aws(credentialsId: 'AKIA5CBDRLE2P27OTD43')]) {  // Use the AWS credentials
-                    sh "aws s3 cp application.zip s3://${S3_BUCKET}/${S3_KEY}"
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'AKIA5CBDRLE2P27OTD43'
+                ]]) {
+                    sh "aws s3 cp app.zip s3://${S3_BUCKET}/${S3_KEY}"
                 }
             }
         }
 
         stage('Deploy with Terraform') {
             steps {
-                withCredentials([aws(credentialsId: 'AKIA5CBDRLE2P27OTD43')]) {  // Use the same AWS credentials for Terraform
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'AKIA5CBDRLE2P27OTD43'
+                ]]) {
                     dir('terraform') {
-                        // Set environment variables for AWS credentials so Terraform can use them
-                            sh 'terraform init'
-                            sh 'terraform apply -auto-approve'
+                        sh 'terraform init'
+                        sh 'terraform apply -auto-approve'
                     }
                 }
             }
