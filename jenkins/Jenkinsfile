@@ -26,10 +26,8 @@ pipeline {
                 withCredentials([aws(credentialsId: 'AKIA5CBDRLE2P27OTD43')]) {  // Use the same AWS credentials for Terraform
                     dir('terraform') {
                         // Set environment variables for AWS credentials so Terraform can use them
-                        withEnv(["AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"]) {
                             sh 'terraform init'
                             sh 'terraform apply -auto-approve'
-                        }
                     }
                 }
             }
