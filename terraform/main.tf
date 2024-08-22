@@ -17,9 +17,17 @@ variable "environment_name" {
   description = "The name of the existing Elastic Beanstalk environment"
 }
 
+variable "application_name" {
+  type = string
+  description = "The name of the existing Elastic Beanstalk application"
+}
+
+resource "aws_elastic_beanstalk_environment" "my_env" {
+  name = var.environment_name
+}
+
 resource "aws_elastic_beanstalk_application" "my_app" {
-  name        = "Sample-beanstalk-env"
-  description = "My Elastic Beanstalk Application"
+  name = var.application_name
 }
 
 resource "aws_elastic_beanstalk_application_version" "my_app_version" {
@@ -28,10 +36,4 @@ resource "aws_elastic_beanstalk_application_version" "my_app_version" {
   description = "My Elastic Beanstalk Application Version"
   bucket      = var.s3_bucket
   key         = var.s3_key
-}
-
-resource "aws_elastic_beanstalk_environment" "my_env" {
-  name                = var.environment_name
-  application         = aws_elastic_beanstalk_application.my_app.name
-  version_label       = aws_elastic_beanstalk_application_version.my_app_version.name
 }
