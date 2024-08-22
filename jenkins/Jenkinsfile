@@ -5,6 +5,7 @@ pipeline {
         S3_BUCKET = 'my-s3-bucket-for-jenkins-pipeline-setup'
         S3_KEY = 'my-app.zip'
         ENVIRONMENT_NAME = 'Sample-beanstalk-env-env'
+        APPLICATION_NAME = 'Sample-beanstalk-env'
     }
 
     stages {
@@ -34,10 +35,13 @@ pipeline {
                     dir('terraform') {
                         sh 'terraform init'
                         sh """
+                            terraform import aws_elastic_beanstalk_environment.my_env ${ENVIRONMENT_NAME}
+                            terraform import aws_elastic_beanstalk_application.my_app ${APPLICATION_NAME}
                             terraform apply -auto-approve \
                             -var 's3_bucket=${S3_BUCKET}' \
                             -var 's3_key=${S3_KEY}'\
-                            -var 'environment_name=${ENVIRONMENT_NAME}'
+                            -var 'environment_name=${ENVIRONMENT_NAME}' \
+                            -var 'application_name=${APPLICATION_NAME}'
                         """
                     }
                 }
