@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    environment {
+        S3_BUCKET = 'my-s3-bucket-for-jenkins-pipeline-setup'  // Replace with your actual S3 bucket name
+        S3_KEY = 'my-app.zip'  // Replace with the actual S3 key you want to use
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/your-repo-url.git', branch: 'main'
+            }
+        }
+
+        stage('Upload to S3') {
+            steps {
+                withCredentials([aws(credentialsId: 'AKIA5CBDRLE2P27OTD43')]) {  // Use the AWS credentials
+                    sh "aws s3 cp app.zip s3://${S3_BUCKET}/${S3_KEY}"
+                }
+            }
+        }
+
+        stage('Deploy with Terraform') {
+            steps {
+                withCredentials([aws(credentialsId: 'AKIA5CBDRLE2P27OTD43')]) {  // Use the same AWS credentials for Terraform
+                    dir('terraform') {
+                        // Set environment variables for AWS credentials so Terraform can use them
+                        withEnv(["AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"]) {
+                            sh 'terraform init'
+                            sh 'terraform apply -auto-approve'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Deployment process completed.'
+        }
+    }
+}
