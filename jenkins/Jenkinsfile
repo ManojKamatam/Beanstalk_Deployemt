@@ -12,13 +12,7 @@ pipeline {
                 git url: 'https://github.com/ManojKamatam/Beanstalk_Deployemt.git', branch: 'main'
             }
         }
-
-        stage('Checkpoint After Checkout') {
-            steps {
-                checkpoint('After Checkout')
-            }
-        }
-
+        
         stage('Upload to S3') {
             steps {
                 withCredentials([[
@@ -27,12 +21,6 @@ pipeline {
                 ]]) {
                     sh "aws s3 cp application.zip s3://${S3_BUCKET}/${S3_KEY}"
                 }
-            }
-        }
-
-        stage('Checkpoint After Upload to S3') {
-            steps {
-                checkpoint('After Upload to S3')
             }
         }
 
@@ -51,12 +39,6 @@ pipeline {
                         """
                     }
                 }
-            }
-        }
-
-        stage('Checkpoint After Terraform Deployment') {
-            steps {
-                checkpoint('After Terraform Deployment')
             }
         }
     }
