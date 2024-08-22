@@ -19,7 +19,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-credentials-id'
                 ]]) {
-                    sh "aws s3 cp app.zip s3://${S3_BUCKET}/${S3_KEY}"
+                    sh "aws s3 cp application.zip s3://${S3_BUCKET}/${S3_KEY}"
                 }
             }
         }
