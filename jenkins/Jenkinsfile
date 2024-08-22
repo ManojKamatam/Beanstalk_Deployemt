@@ -2,14 +2,20 @@ pipeline {
     agent any
 
     environment {
-        S3_BUCKET = 'my-s3-bucket-for-jenkins-pipeline-setup'  // Replace with your actual S3 bucket name
-        S3_KEY = 'my-app.zip'  // Replace with the actual S3 key you want to use
+        S3_BUCKET = 'my-s3-bucket-for-jenkins-pipeline-setup'
+        S3_KEY = 'my-app.zip'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/ManojKamatam/Beanstalk_Deployemt.git', branch: 'main'
+            }
+        }
+
+        stage('Checkpoint After Checkout') {
+            steps {
+                checkpoint('After Checkout')
             }
         }
 
@@ -24,6 +30,12 @@ pipeline {
             }
         }
 
+        stage('Checkpoint After Upload to S3') {
+            steps {
+                checkpoint('After Upload to S3')
+            }
+        }
+
         stage('Deploy with Terraform') {
             steps {
                 withCredentials([[
@@ -32,7 +44,6 @@ pipeline {
                 ]]) {
                     dir('terraform') {
                         sh 'terraform init'
-                        // Pass the required variables to Terraform
                         sh """
                             terraform apply -auto-approve \
                             -var 's3_bucket=${S3_BUCKET}' \
@@ -40,6 +51,12 @@ pipeline {
                         """
                     }
                 }
+            }
+        }
+
+        stage('Checkpoint After Terraform Deployment') {
+            steps {
+                checkpoint('After Terraform Deployment')
             }
         }
     }
