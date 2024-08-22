@@ -17,7 +17,7 @@ pipeline {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'AKIA5CBDRLE2P27OTD43'
+                    credentialsId: 'aws-credentials-id'
                 ]]) {
                     sh "aws s3 cp app.zip s3://${S3_BUCKET}/${S3_KEY}"
                 }
@@ -28,7 +28,7 @@ pipeline {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'AKIA5CBDRLE2P27OTD43'
+                    credentialsId: 'aws-credentials-id'
                 ]]) {
                     dir('terraform') {
                         sh 'terraform init'
