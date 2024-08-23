@@ -24,4 +24,8 @@ resource "aws_elastic_beanstalk_application_version" "my_app_version" {
   description = "My Elastic Beanstalk Application Version"
   bucket      = var.s3_bucket
   key         = var.s3_key
+  
+  lifecycle {
+    prevent_destroy = true
+  }
 }
