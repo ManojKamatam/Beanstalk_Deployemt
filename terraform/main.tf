@@ -17,15 +17,3 @@ variable "application_name" {
 variable "version_label" {
   type = string
 }
-
-resource "aws_elastic_beanstalk_application_version" "my_app_version" {
-  name        = var.version_label
-  application = var.application_name
-  description = "My Elastic Beanstalk Application Version"
-  bucket      = var.s3_bucket
-  key         = var.s3_key
-  
-  lifecycle {
-    prevent_destroy = true
-  }
-}
