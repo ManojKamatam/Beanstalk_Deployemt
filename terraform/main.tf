@@ -19,6 +19,7 @@ variable "version_label" {
 }
 
 resource "aws_elastic_beanstalk_application_version" "my_app_version" {
+  name        = "my-app-version"
   application   = var.application_name
   version_label = var.version_label
   description   = "My Elastic Beanstalk Application Version"
