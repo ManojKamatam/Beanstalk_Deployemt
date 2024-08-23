@@ -8,3 +8,8 @@ This resource should have these,
   description = "My Elastic Beanstalk Application Version"
   bucket      = ""
   key         = ""
+
+To ensure each version is not override, use this...
+  lifecycle {
+    prevent_destroy = true
+  }
