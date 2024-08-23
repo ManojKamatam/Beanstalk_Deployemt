@@ -5,9 +5,10 @@ pipeline {
     environment {
         S3_BUCKET = 'my-s3-bucket-for-jenkins-pipeline-setup'
         S3_KEY = 'my-app.zip'
-        ENVIRONMENT_NAME = 'Sample-beanstalk-env-env'
-        APPLICATION_NAME = 'Sample-beanstalk-env'
+        ENVIRONMENT_NAME = 'Windowsbasedpythonapplication-env'
+        APPLICATION_NAME = 'windows_based_python_application'
         AWS_REGION = 'us-east-1'
+        VERSION_LABEL = "app-version-${BUILD_NUMBER}"  // Unique version label using Jenkins build number
     }
 
     stages {
@@ -20,7 +21,23 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-id']]) {
-                    bat "aws s3 cp application.zip s3://${S3_BUCKET}/${S3_KEY} --region ${AWS_REGION}"
+                    sh "aws s3 cp application.zip s3://${S3_BUCKET}/${S3_KEY} --region ${AWS_REGION}"
+                }
+            }
+        }
+
+        stage('Deploy Application Version') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-id']]) {
+                    dir('terraform') {
+                        sh """
+                            terraform apply -auto-approve \
+                            -var 's3_bucket=${S3_BUCKET}' \
+                            -var 's3_key=${S3_KEY}' \
+                            -var 'application_name=${APPLICATION_NAME}' \
+                            -var 'version_label=${VERSION_LABEL}'
+                        """
+                    }
                 }
             }
         }
@@ -28,11 +45,11 @@ pipeline {
         stage('Update Elastic Beanstalk Environment') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-id']]) {
-                    bat """
+                    sh """
                         aws elasticbeanstalk update-environment \
                           --application-name ${APPLICATION_NAME} \
                           --environment-name ${ENVIRONMENT_NAME} \
-                          --version-label my-app-version \
+                          --version-label ${VERSION_LABEL} \
                           --region ${AWS_REGION}
                     """
                 }
